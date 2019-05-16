@@ -1,0 +1,27 @@
+Bootstrap: docker
+From: docker.io/zephyrprojectrtos/zephyr-build:latest
+
+%environment
+    export LC_ALL=en_US.UTF-8
+
+%post
+    apt update
+    apt install -y zip wget python-dev gcc git make
+    wget https://bootstrap.pypa.io/get-pip.py
+    python2 get-pip.py
+    python2 -m pip install robotframework==3.0.4 netifaces requests psutil
+
+    cd /opt
+    wget https://antmicro.com/projects/renode/builds/renode-1.8.1.linux-portable.tar.gz
+    tar xzvf renode-1.8.1.linux-portable.tar.gz
+    mv renode_1.8.1_portable renode
+    cd renode
+    wget https://github.com/mgielda/renode-tests-files/archive/master.zip
+    unzip master.zip
+    mv renode-tests-files-master tests
+
+%runscript
+    if [ "$#" -eq 1 ]; then
+        cd $1
+    fi
+    exec ./entrypoint.sh
